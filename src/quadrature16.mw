@@ -1,0 +1,63 @@
+% MATLAB bindings for near/self and mid quadrature, target classification and projection.
+% The Makefile generates the quadrature16 gateway and its eight wrappers in build/: quadSD{,_helm,_stok}_w16_mex,
+% quadSD{,_helm,_stok}_mid_w16_mex, project_t0_h_w16_mex, prepare_quadSD_targets_w16_mex.
+% Arrays pass as they are: double[]/int[] take their size from the input and Fortran reads them with its own
+% dimensions; an empty array arrives as NULL (unused type-b inputs when ib=0, WSn/WDn when not requested).
+% mwrap accepts only double: other, onsurface_comp and if_h0 may come in as logical; inside16, outside16, root_ok (bool[],
+% Fortran logical(c_bool)) go in as double and come back logical.
+% inout arrays come back 2D (rows x product of the other dims), so WSn, WDn get their shape back.
+% work, lwork: reserved workspace arguments.
+
+@function [WS,WD,WSn,WDn,t0,h,work,ier] = quadSD_w16_mex(m,tx,tnx,n,sx,snx,WS,WD,WSn,WDn,t0,h,sw,center,C_X,C_Xi,C_Xij,C_X_fit,cols,target_idx,other,onsurface_comp,ib,xb,cols_typeb,cxb,cxpb,cxppb,tcen,tsca,tau0,if_h0,ifS,ifD,ifSn,ifDn,work,ier)
+other=double(other); onsurface_comp=double(onsurface_comp); if_h0=double(if_h0);
+nb=numel(xb)/3; lwork=numel(work); size_Sn=size(WSn); size_Dn=size(WDn);
+# FORTRAN quadSD_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, inout double[] WS, inout double[] WD, inout double[] WSn, inout double[] WDn, inout double[] t0, inout double[] h, double[] sw, double[] center, double[] C_X, double[] C_Xi, double[] C_Xij, double[] C_X_fit, int[] cols, int[] target_idx, int[] other, int[1] onsurface_comp, int[1] ib, int[1] nb, double[] xb, int[] cols_typeb, double[] cxb, double[] cxpb, double[] cxppb, double[] tcen, double[] tsca, double[] tau0, int[] if_h0, int[1] ifS, int[1] ifD, int[1] ifSn, int[1] ifDn, int[1] lwork, inout double[] work, inout int[] ier);
+WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
+
+@function [WS,WD,WSn,WDn,t0,h,work,ier] = quadSD_helm_w16_mex(m,tx,tnx,n,sx,snx,WS,WD,WSn,WDn,t0,h,sw,center,C_X,C_Xi,C_Xij,C_X_fit,cols,target_idx,other,onsurface_comp,ib,xb,cols_typeb,cxb,cxpb,cxppb,tcen,tsca,tau0,if_h0,ifS,ifD,ifSn,ifDn,zk,work,ier)
+other=double(other); onsurface_comp=double(onsurface_comp); if_h0=double(if_h0);
+nb=numel(xb)/3; lwork=numel(work); size_Sn=size(WSn); size_Dn=size(WDn);
+WS=complex(WS); WD=complex(WD); WSn=complex(WSn); WDn=complex(WDn); zk=complex(zk);
+# FORTRAN quadSD_helm_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, inout dcomplex[] WS, inout dcomplex[] WD, inout dcomplex[] WSn, inout dcomplex[] WDn, inout double[] t0, inout double[] h, double[] sw, double[] center, double[] C_X, double[] C_Xi, double[] C_Xij, double[] C_X_fit, int[] cols, int[] target_idx, int[] other, int[1] onsurface_comp, int[1] ib, int[1] nb, double[] xb, int[] cols_typeb, double[] cxb, double[] cxpb, double[] cxppb, double[] tcen, double[] tsca, double[] tau0, int[] if_h0, int[1] ifS, int[1] ifD, int[1] ifSn, int[1] ifDn, dcomplex[1] zk, int[1] lwork, inout double[] work, inout int[] ier);
+WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
+
+@function [WS,WD,WSn,WDn,t0,h,work,ier] = quadSD_stok_w16_mex(m,tx,tnx,n,sx,snx,WS,WD,WSn,WDn,t0,h,sw,center,C_X,C_Xi,C_Xij,C_X_fit,cols,target_idx,other,onsurface_comp,ib,xb,cols_typeb,cxb,cxpb,cxppb,tcen,tsca,tau0,if_h0,ifS,ifD,ifSn,ifDn,work,ier)
+other=double(other); onsurface_comp=double(onsurface_comp); if_h0=double(if_h0);
+nb=numel(xb)/3; lwork=numel(work); size_S=size(WS); size_D=size(WD); size_Sn=size(WSn); size_Dn=size(WDn);
+# FORTRAN quadSD_stok_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, inout double[] WS, inout double[] WD, inout double[] WSn, inout double[] WDn, inout double[] t0, inout double[] h, double[] sw, double[] center, double[] C_X, double[] C_Xi, double[] C_Xij, double[] C_X_fit, int[] cols, int[] target_idx, int[] other, int[1] onsurface_comp, int[1] ib, int[1] nb, double[] xb, int[] cols_typeb, double[] cxb, double[] cxpb, double[] cxppb, double[] tcen, double[] tsca, double[] tau0, int[] if_h0, int[1] ifS, int[1] ifD, int[1] ifSn, int[1] ifDn, int[1] lwork, inout double[] work, inout int[] ier);
+WS=reshape(WS,size_S); WD=reshape(WD,size_D); WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
+
+@function [inside16,outside16,xc,rt0,rp0,e1,e2,e3,r,xyz,d16,d128,lambda1] = prepare_quadSD_targets_w16_mex(m,tx,n,sx,C_X,C_Xi,geometry_center,geometry_scale,inside16,outside16,xc,rt0,rp0,e1,e2,e3,r,xyz,d16,d128,lambda1)
+inside16=double(inside16); outside16=double(outside16);
+# FORTRAN prepare_quadSD_targets_w16(int[1] m, double[] tx, int[1] n, double[] sx, double[] C_X, double[] C_Xi, double[] geometry_center, double[] geometry_scale, inout bool[] inside16, inout bool[] outside16, inout double[] xc, inout double[] rt0, inout double[] rp0, inout double[] e1, inout double[] e2, inout double[] e3, inout double[] r, inout double[] xyz, inout double[] d16, inout double[] d128, inout double[] lambda1);
+inside16=logical(inside16); outside16=logical(outside16);
+end
+
+@function [t0,h,root_ok] = project_t0_h_w16_mex(sx,st,cols,C_X,C_Xi,C_Xij,tx,target_idx,other,onsurface_comp,ib,xb,g16,cols_typeb,cxb,cxpb,cxppb,tcen,tsca,tau0,root_x,root_t,root_bound,if_h0,t0,h,root_ok)
+other=double(other); onsurface_comp=double(onsurface_comp); if_h0=double(if_h0); root_ok=double(root_ok);
+m=size(tx,2); n=size(sx,2); nb=numel(xb)/3; nr=size(root_x,2); root_bound=root_bound(:).*[1;1];
+# FORTRAN project_t0_h_w16(int[1] m, int[1] n, int[1] nb, int[1] nr, double[] sx, double[] st, int[] cols, double[] C_X, double[] C_Xi, double[] C_Xij, double[] tx, int[] target_idx, int[] other, int[1] onsurface_comp, int[1] ib, double[] xb, double[] g16, int[] cols_typeb, double[] cxb, double[] cxpb, double[] cxppb, double[] tcen, double[] tsca, double[] tau0, double[] root_x, double[] root_t, double[] root_bound, int[] if_h0, inout double[] t0, inout double[] h, inout bool[] root_ok);
+root_ok=logical(root_ok);
+end
+
+@function [WS,WD,WSn,WDn,classification,ier] = quadSD_mid_w16_mex(m,tx,tnx,n,sx,snx,sw,WS,WD,ifSn,ifDn,WSn,WDn,t0,h,C_X,C_Xi,C_Xij,geometry_center,geometry_scale,classification,C_Xi_typeb,C_Xij_typeb,geometry_center_typeb,geometry_scale_typeb,ier,root_ok)
+root_ok=double(root_ok); size_Sn=size(WSn); size_Dn=size(WDn);
+# FORTRAN quadSD_mid_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, double[] sw, inout double[] WS, inout double[] WD, int[1] ifSn, int[1] ifDn, inout double[] WSn, inout double[] WDn, double[] t0, double[] h, double[] C_X, double[] C_Xi, double[] C_Xij, double[] geometry_center, double[] geometry_scale, inout int[] classification, double[] C_Xi_typeb, double[] C_Xij_typeb, double[] geometry_center_typeb, double[] geometry_scale_typeb, inout int[] ier, bool[] root_ok);
+WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
+
+@function [WS,WD,WSn,WDn,classification,ier] = quadSD_stok_mid_w16_mex(m,tx,tnx,n,sx,snx,sw,WS,WD,WSn,WDn,ifS,ifD,ifSn,ifDn,t0,h,C_X,C_Xi,C_Xij,geometry_center,geometry_scale,classification,C_Xi_typeb,C_Xij_typeb,geometry_center_typeb,geometry_scale_typeb,ier,root_ok)
+root_ok=double(root_ok); size_S=size(WS); size_D=size(WD); size_Sn=size(WSn); size_Dn=size(WDn);
+# FORTRAN quadSD_stok_mid_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, double[] sw, inout double[] WS, inout double[] WD, inout double[] WSn, inout double[] WDn, int[1] ifS, int[1] ifD, int[1] ifSn, int[1] ifDn, double[] t0, double[] h, double[] C_X, double[] C_Xi, double[] C_Xij, double[] geometry_center, double[] geometry_scale, inout int[] classification, double[] C_Xi_typeb, double[] C_Xij_typeb, double[] geometry_center_typeb, double[] geometry_scale_typeb, inout int[] ier, bool[] root_ok);
+WS=reshape(WS,size_S); WD=reshape(WD,size_D); WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
+
+@function [WS,WD,WSn,WDn,classification,ier] = quadSD_helm_mid_w16_mex(m,tx,tnx,n,sx,snx,sw,WS,WD,ifSn,ifDn,WSn,WDn,t0,h,C_X,C_Xi,C_Xij,geometry_center,geometry_scale,classification,C_Xi_typeb,C_Xij_typeb,geometry_center_typeb,geometry_scale_typeb,ier,root_ok,zk)
+root_ok=double(root_ok); size_Sn=size(WSn); size_Dn=size(WDn);
+WS=complex(WS); WD=complex(WD); WSn=complex(WSn); WDn=complex(WDn); zk=complex(zk);
+# FORTRAN quadSD_helm_mid_w16(int[1] m, double[] tx, double[] tnx, int[1] n, double[] sx, double[] snx, double[] sw, inout dcomplex[] WS, inout dcomplex[] WD, int[1] ifSn, int[1] ifDn, inout dcomplex[] WSn, inout dcomplex[] WDn, double[] t0, double[] h, double[] C_X, double[] C_Xi, double[] C_Xij, double[] geometry_center, double[] geometry_scale, inout int[] classification, double[] C_Xi_typeb, double[] C_Xij_typeb, double[] geometry_center_typeb, double[] geometry_scale_typeb, inout int[] ier, bool[] root_ok, dcomplex[1] zk);
+WSn=reshape(WSn,size_Sn); WDn=reshape(WDn,size_Dn);
+end
